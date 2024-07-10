@@ -43,10 +43,19 @@ class AtomicDict:
         self.mv.release()
         self.mm.close()
 
-    def __getitem__(self, x: int) -> AtomicValue:
-        """dict[key] will return the AtomicValue associated to key
+    def __getitem__(self, key: int) -> AtomicValue:
+        """dict[key] will return the AtomicValue associated with key
 
-        key must be a non-zero 64-bit value.
+        key must be a non-zero 64-bit unsigned integer.
+        The initial value of the AtomicValue is 0.
         """
 
-        return self.aa.index(x)
+        return self.aa.index(key)
+
+    def __setitem__(self, key: int, value: int) -> None:
+        """`dict[key] = value` will update the AtomicValue associated with key to value.
+
+        key must be a non-zero 64-bit unsigned integer.
+        value must be a 64-bit unsigned integer.
+        """
+        self.aa.index(key).store(value)
