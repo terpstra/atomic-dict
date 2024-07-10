@@ -1,4 +1,4 @@
-# Atomic-Dict: A library for lock-free shared 64-bit dictionary
+# Atomic-Dict: A library for lock-free shared 64-bit dictionaries
 
 Atomic-Dict provides a shared Map[Int, Int] for 64-bit integer values.
 Create an AtomicDict(), fork, then update keyed values using atomic operations.

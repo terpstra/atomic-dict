@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "atomic_dict"
 version = "0.1.0"
-description = ""
+description = "A library for lock-free shared 64-bit dictionaries"
 authors = ["Wesley W. Terpstra <wesley@sifive.com>"]
 
 [tool.poetry.dependencies]
