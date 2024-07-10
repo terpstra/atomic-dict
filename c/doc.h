@@ -33,6 +33,17 @@ PyDoc_STRVAR(
         "The AtomicValue assigned to this key in the AtomicArray");
 
 PyDoc_STRVAR(
+        atomic_array_iterator_doc,
+        "iterator(self)\n"
+        "--\n"
+        "\n"
+        "Retrieves a NON-ATOMIC iterator for reading out the contents of the AtomicArray\n"
+        "\n"
+        "Return value\n"
+        "----------\n"
+        "A DictIterator which can read-out the contents of an AtomicDict");
+
+PyDoc_STRVAR(
         atomic_value_load_doc,
         "load(self)\n"
         "--\n"
@@ -165,6 +176,40 @@ PyDoc_STRVAR(
         "Return value\n"
         "----------\n"
         "The value immediately preceding the effects of this function");
+
+PyDoc_STRVAR(
+        dict_iterator_key_doc,
+        "key(self)\n"
+        "--\n"
+        "\n"
+        "Return the key of the current element."
+        "If the iterator has reached the end of the Dict, 0 is returned."
+        "\n"
+        "Return value\n"
+        "----------\n"
+        "The unsigned long of the key in the current entry");
+
+PyDoc_STRVAR(
+        dict_iterator_value_doc,
+        "value(self)\n"
+        "--\n"
+        "\n"
+        "Return the value of the current element."
+        "\n"
+        "Return value\n"
+        "----------\n"
+        "The unsigned long of the value in the current entry");
+
+PyDoc_STRVAR(
+        dict_iterator_next_doc,
+        "key(self)\n"
+        "--\n"
+        "\n"
+        "Advance the iterator to the next element."
+        "\n"
+        "Return value\n"
+        "----------\n"
+        "None");
 
 PyDoc_STRVAR(
         get_pointer_doc,

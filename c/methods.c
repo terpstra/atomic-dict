@@ -1,6 +1,7 @@
 #include "methods.h"
 
 extern PyTypeObject AtomicValueType;
+extern PyTypeObject DictIteratorType;
 
 int atomic_array_init(AtomicArray *self, PyObject *args, PyObject *kwds) {
     PyObject *memory_view;
@@ -89,6 +90,20 @@ AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ss
     return value;
 }
 
+DictIterator *atomic_array_iterator(AtomicArray *self, PyObject * const *args, Py_ssize_t nargs) {
+    DictIterator *out;
+
+    CHECK_ARGN("AtomicArray.iterator", 0);
+
+    out = PyObject_New(DictIterator, &DictIteratorType);
+    if (out) {
+        out->array = self;
+        out->offset = 0;
+    }
+
+    return out;
+}
+
 PyObject *atomic_value_load(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
     CHECK_ARGN("AtomicValue.load", 0);
     return PyLong_FromUnsignedLongLong(atomic_load(self->val));
@@ -136,6 +151,51 @@ PyObject *atomic_value_cas(AtomicValue *self, PyObject * const *args, Py_ssize_t
     atomic_uint_fast64_t desired  = PyLong_AsUnsignedLongLong(args[1]);
     atomic_compare_exchange_strong(self->val, &expected, desired);
     return PyLong_FromUnsignedLongLong(expected);
+}
+
+PyObject *dict_iterator_key(DictIterator *self, PyObject * const *args, Py_ssize_t nargs) {
+    AtomicCacheBlock *block = self->array->blocks + (self->offset >> 2);
+    AtomicCacheBlock *end = self->array->blocks + self->array->num_blocks;
+
+    CHECK_ARGN("DictIterator.key", 0);
+
+    while (block != end) {
+        atomic_uint_fast64_t key = atomic_load(&block->keys[self->offset & 3]);
+        if (key) return PyLong_FromUnsignedLongLong(key);
+        ++self->offset;
+        if (0 == (self->offset & 3)) ++block;
+    }
+
+    return PyLong_FromUnsignedLongLong(0);
+}
+
+PyObject *dict_iterator_value(DictIterator *self, PyObject * const *args, Py_ssize_t nargs) {
+    AtomicCacheBlock *block = self->array->blocks + (self->offset >> 2);
+    AtomicCacheBlock *end = self->array->blocks + self->array->num_blocks;
+
+    CHECK_ARGN("DictIterator.value", 0);
+
+    while (block != end) {
+        atomic_uint_fast64_t key = atomic_load(&block->keys[self->offset & 3]);
+        if (key) {
+            atomic_uint_fast64_t val = atomic_load(&block->vals[self->offset & 3]);
+            return PyLong_FromUnsignedLongLong(val);
+        }
+        ++self->offset;
+        if (0 == (self->offset & 3)) ++block;
+    }
+
+    return PyLong_FromUnsignedLongLong(0);
+}
+
+PyObject *dict_iterator_next(DictIterator *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("DictIterator.next", 0);
+
+    if (self->offset >> 2 < self->array->num_blocks) {
+        ++self->offset;
+    }
+
+    Py_RETURN_NONE;
 }
 
 PyObject *get_pointer(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {

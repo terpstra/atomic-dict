@@ -22,4 +22,10 @@ typedef struct {
     atomic_uint_fast64_t *val;
 } AtomicValue;
 
+typedef struct {
+    PyObject_HEAD
+    AtomicArray *array;
+    Py_ssize_t offset;
+} DictIterator;
+
 #endif
