@@ -37,7 +37,7 @@ if __name__ == "__main__":
       for _ in range(32*1024):
           idx = dict[0].add(1) # also: or, xor, and, swap, cas(expected, replacement)
           dict[100 + idx] = id
-  with context.pool.Pool(8) as p:
-      p.map(f, range(16))
+  with context.Pool(8) as p:
+      p.map(worker, range(16))
 ```
 
