@@ -5,7 +5,7 @@
 
 int atomic_array_init(AtomicArray *self, PyObject *args, PyObject *kwds);
 
-PyObject *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ssize_t nargs);
+AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ssize_t nargs);
 
 
 PyObject *atomic_value_swap(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs);

@@ -1,4 +1,9 @@
+import os
 from setuptools import setup, Extension, find_packages
+import sys
+
+cmd = ['build', '--build-lib', os.getcwd()]
+sys.argv.extend(cmd)
 
 atomic_dict_c_module = Extension(
     "atomic_dict.atomic_dict_c",
