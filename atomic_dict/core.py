@@ -2,10 +2,12 @@
 
 from mmap import MAP_SHARED, PROT_READ, PROT_WRITE, mmap
 
+from atomic_dict.atomic_dict_c import AtomicArray, AtomicValue
 
 class AtomicDict:
     mm: mmap
     mv: memoryview
+    aa: AtomicArray
 
     def __init__(self, max_entries: int) -> None:
         """Create a multi-process / multi-threaded shared dictionary.
@@ -28,6 +30,9 @@ class AtomicDict:
         # Convert to a mutable view
         self.mv = memoryview(self.mm)
 
+        # Pass the shared memory to C
+        self.aa = AtomicArray(self.mv)
+
     def __del__(self) -> None:
         """Close the shared memory map uoon destruction.
 
@@ -38,3 +43,10 @@ class AtomicDict:
         self.mv.release()
         self.mm.close()
 
+    def __getitem__(self, x: int) -> AtomicValue:
+        """dict[key] will return the AtomicValue associated to key
+
+        key must be a non-zero 64-bit value.
+        """
+
+        return self.aa.index(x)
