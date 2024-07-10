@@ -3,11 +3,17 @@
 #include "doc.h"
 
 
+PyMethodDef atomic_dict_c_methods[] = {
+        {"get_pointer", (PyCFunction) get_pointer, METH_FASTCALL, get_pointer_doc},
+        {NULL}  /* Sentinel */
+};
+
 struct PyModuleDef atomic_dict_c_module = {
         PyModuleDef_HEAD_INIT,
         .m_name = "atomic_dict_c",
         .m_doc = atomic_dict_doc,
-        .m_size = -1
+        .m_size = -1,
+        .m_methods = atomic_dict_c_methods,
 };
 
 PyMethodDef atomic_array_methods[] = {

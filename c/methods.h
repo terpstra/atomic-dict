@@ -26,4 +26,7 @@ PyObject *atomic_value_xor(AtomicValue *self, PyObject * const *args, Py_ssize_t
 
 PyObject *atomic_value_cas(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs);
 
+
+PyObject *get_pointer(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs);
+
 #endif

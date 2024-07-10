@@ -166,4 +166,20 @@ PyDoc_STRVAR(
         "----------\n"
         "The value immediately preceding the effects of this function");
 
+PyDoc_STRVAR(
+        get_pointer_doc,
+        "get_pointer(capsule)\n"
+        "--\n"
+        "\n"
+        "Retrieve the underlying pointer of a capsule."
+        "This might be useful as a key for AtomicDict\n"
+        "\n"
+        "Parameters\n"
+        "----------\n"
+        "capsule : PyCapsule for the C object to identify\n"
+        "\n"
+        "Return value\n"
+        "----------\n"
+        "An unsigned long corresponding to the capsule's pointer");
+
 #endif
