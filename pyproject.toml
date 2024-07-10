@@ -9,7 +9,7 @@ warn_unreachable = true
 
 [tool.poetry]
 name = "atomic_dict"
-version = "0.2.0"
+version = "0.3.0"
 description = "A library for lock-free shared 64-bit dictionaries"
 license = "BSD-3"
 readme = "README.md"

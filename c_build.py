@@ -13,7 +13,7 @@ atomic_dict_c_module = Extension(
 
 setup(
     name="atomic_dict",
-    version="0.2.0",
+    version="0.3.0",
     packages=find_packages(),
     ext_modules=[atomic_dict_c_module],
 )
