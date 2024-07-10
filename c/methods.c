@@ -44,6 +44,7 @@ AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ss
     uint64_t             hash;
     Py_ssize_t           index;
     Py_ssize_t           stride;
+    Py_ssize_t           attempts;
     AtomicValue         *value;
 
     CHECK_ARGN("index", 1);
@@ -57,7 +58,7 @@ AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ss
     index = hash & (self->num_blocks - 1);
     stride = ((hash >> 32) & (self->num_blocks - 1)) | 1;
 
-    while (1) {
+    for (attempts = 0; attempts < self->num_blocks; ++attempts) {
         AtomicCacheBlock *block = self->blocks + index;
 
         expected = 0;
@@ -77,6 +78,12 @@ AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ss
         if (expected == 0 || expected == key) { value->val = &block->vals[3]; break; }
 
         index = (index + stride) & (self->num_blocks - 1);
+    }
+
+    if (attempts == self->num_blocks) {
+        Py_DECREF(value);
+        PyErr_SetString(PyExc_ValueError, "AtomicArray capacity exceeded");
+        return 0;
     }
 
     return value;
