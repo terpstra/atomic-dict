@@ -31,6 +31,13 @@ static uint64_t key_hash(uint64_t key) {
     return key;
 }
 
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#define CHECK_ARGN(fn, n) if (nargs != n) {                                               \
+    PyErr_SetString(PyExc_TypeError, "AtomicValue." fn " expected " STR(n) " arguments"); \
+    return 0;                                                                             \
+}
+
 AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ssize_t nargs) {
     atomic_uint_fast64_t key;
     atomic_uint_fast64_t expected;
@@ -38,6 +45,8 @@ AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ss
     Py_ssize_t           index;
     Py_ssize_t           stride;
     AtomicValue         *value;
+
+    CHECK_ARGN("index", 1);
 
     key = PyLong_AsUnsignedLongLong(args[0]);
     
@@ -74,64 +83,50 @@ AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ss
 }
 
 PyObject *atomic_value_load(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("load", 0);
     return PyLong_FromUnsignedLongLong(atomic_load(self->val));
 }
 
 PyObject *atomic_value_store(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    if (nargs > 0) {
-        atomic_store(self->val, PyLong_AsUnsignedLongLong(args[0]));
-    }
+    CHECK_ARGN("store", 1);
+    atomic_store(self->val, PyLong_AsUnsignedLongLong(args[0]));
     Py_RETURN_NONE;
 }
 
 PyObject *atomic_value_swap(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    if (nargs > 0) {
-        return PyLong_FromUnsignedLongLong(atomic_exchange(self->val, PyLong_AsUnsignedLongLong(args[0])));
-    }
-    Py_RETURN_NONE;
+    CHECK_ARGN("swap", 1);
+    return PyLong_FromUnsignedLongLong(atomic_exchange(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
 PyObject *atomic_value_add(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    if (nargs > 0) {
-        return PyLong_FromUnsignedLongLong(atomic_fetch_add(self->val, PyLong_AsUnsignedLongLong(args[0])));
-    }
-    Py_RETURN_NONE;
+    CHECK_ARGN("add", 1);
+    return PyLong_FromUnsignedLongLong(atomic_fetch_add(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
 PyObject *atomic_value_sub(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    if (nargs > 0) {
-        return PyLong_FromUnsignedLongLong(atomic_fetch_sub(self->val, PyLong_AsUnsignedLongLong(args[0])));
-    }
-    Py_RETURN_NONE;
+    CHECK_ARGN("sub", 1);
+    return PyLong_FromUnsignedLongLong(atomic_fetch_sub(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
 PyObject *atomic_value_and(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    if (nargs > 0) {
-        return PyLong_FromUnsignedLongLong(atomic_fetch_and(self->val, PyLong_AsUnsignedLongLong(args[0])));
-    }
-    Py_RETURN_NONE;
+    CHECK_ARGN("and", 1);
+    return PyLong_FromUnsignedLongLong(atomic_fetch_and(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
 PyObject *atomic_value_or(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    if (nargs > 0) {
-        return PyLong_FromUnsignedLongLong(atomic_fetch_or(self->val, PyLong_AsUnsignedLongLong(args[0])));
-    }
-    Py_RETURN_NONE;
+    CHECK_ARGN("or", 1);
+    return PyLong_FromUnsignedLongLong(atomic_fetch_or(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
 PyObject *atomic_value_xor(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    if (nargs > 0) {
-        return PyLong_FromUnsignedLongLong(atomic_fetch_xor(self->val, PyLong_AsUnsignedLongLong(args[0])));
-    }
-    Py_RETURN_NONE;
+    CHECK_ARGN("xor", 1);
+    return PyLong_FromUnsignedLongLong(atomic_fetch_xor(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
 PyObject *atomic_value_cas(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    if (nargs > 1) {
-        atomic_uint_fast64_t expected = PyLong_AsUnsignedLongLong(args[0]);
-        atomic_uint_fast64_t desired  = PyLong_AsUnsignedLongLong(args[1]);
-        atomic_compare_exchange_strong(self->val, &expected, desired);
-        return PyLong_FromUnsignedLongLong(expected);
-    }
-    Py_RETURN_NONE;
+    CHECK_ARGN("cas", 2);
+    atomic_uint_fast64_t expected = PyLong_AsUnsignedLongLong(args[0]);
+    atomic_uint_fast64_t desired  = PyLong_AsUnsignedLongLong(args[1]);
+    atomic_compare_exchange_strong(self->val, &expected, desired);
+    return PyLong_FromUnsignedLongLong(expected);
 }

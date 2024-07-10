@@ -36,7 +36,7 @@ PyMethodDef atomic_value_methods[] = {
         {"and",   (PyCFunction) atomic_value_and,   METH_FASTCALL, atomic_value_and_doc},
         {"or",    (PyCFunction) atomic_value_or,    METH_FASTCALL, atomic_value_or_doc},
         {"xor",   (PyCFunction) atomic_value_xor,   METH_FASTCALL, atomic_value_xor_doc},
-        {"cas",   (PyCFunction) atomic_value_xor,   METH_FASTCALL, atomic_value_cas_doc},
+        {"cas",   (PyCFunction) atomic_value_cas,   METH_FASTCALL, atomic_value_cas_doc},
         {NULL}  /* Sentinel */
 };
 
