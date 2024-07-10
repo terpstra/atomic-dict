@@ -35,7 +35,7 @@ if __name__ == "__main__":
   context = multiprocessing.get_context("fork")
   def worker(id: int) -> None:
       for _ in range(32*1024):
-          idx = dict[0].add(1) # also: or, xor, and, swap, cas(expected, replacement)
+          idx = dict[1].add(1) # also: or, xor, and, swap, cas(expected, replacement)
           dict[100 + idx] = id
   with context.Pool(8) as p:
       p.map(worker, range(16))
