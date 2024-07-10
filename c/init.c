@@ -28,11 +28,15 @@ PyTypeObject AtomicArrayType = {
 };
 
 PyMethodDef atomic_value_methods[] = {
-        {"swap", (PyCFunction) atomic_value_swap, METH_FASTCALL, atomic_value_swap_doc},
-        {"add",  (PyCFunction) atomic_value_add,  METH_FASTCALL, atomic_value_add_doc},
-        {"and",  (PyCFunction) atomic_value_and,  METH_FASTCALL, atomic_value_and_doc},
-        {"or",   (PyCFunction) atomic_value_or,   METH_FASTCALL, atomic_value_or_doc},
-        {"xor",  (PyCFunction) atomic_value_xor,  METH_FASTCALL, atomic_value_xor_doc},
+        {"load",  (PyCFunction) atomic_value_load,  METH_FASTCALL, atomic_value_load_doc},
+        {"store", (PyCFunction) atomic_value_store, METH_FASTCALL, atomic_value_store_doc},
+        {"swap",  (PyCFunction) atomic_value_swap,  METH_FASTCALL, atomic_value_swap_doc},
+        {"add",   (PyCFunction) atomic_value_add,   METH_FASTCALL, atomic_value_add_doc},
+        {"sub",   (PyCFunction) atomic_value_sub,   METH_FASTCALL, atomic_value_sub_doc},
+        {"and",   (PyCFunction) atomic_value_and,   METH_FASTCALL, atomic_value_and_doc},
+        {"or",    (PyCFunction) atomic_value_or,    METH_FASTCALL, atomic_value_or_doc},
+        {"xor",   (PyCFunction) atomic_value_xor,   METH_FASTCALL, atomic_value_xor_doc},
+        {"cas",   (PyCFunction) atomic_value_xor,   METH_FASTCALL, atomic_value_cas_doc},
         {NULL}  /* Sentinel */
 };
 
