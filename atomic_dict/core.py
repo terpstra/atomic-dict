@@ -2,7 +2,25 @@
 
 from mmap import MAP_SHARED, PROT_READ, PROT_WRITE, mmap
 
-from atomic_dict.atomic_dict_c import AtomicArray, AtomicValue
+from atomic_dict.atomic_dict_c import AtomicArray, AtomicValue, DictIterator
+
+class DictEntryIterator:
+    it: DictIterator
+
+    def __init__(self, it: DictIterator):
+        self.it = it
+
+    def __next__(self) -> (int, int):
+        """Return the current element and advance the iterator."""
+
+        key = self.it.key()
+        val = self.it.value()
+
+        if key == 0:
+            raise StopIteration()
+
+        self.it.next()
+        return (key, val)
 
 class AtomicDict:
     mm: mmap
@@ -59,3 +77,8 @@ class AtomicDict:
         value must be a 64-bit unsigned integer.
         """
         self.aa.index(key).store(value)
+
+    def __iter__(self) -> DictEntryIterator:
+        """NON-ATOMICALLY iterate through the AtomicDict contents."""
+
+        return DictEntryIterator(self.aa.iterator())
