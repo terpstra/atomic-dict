@@ -26,7 +26,7 @@ PyDoc_STRVAR(
         "\n"
         "Parameters\n"
         "----------\n"
-        "key : A non-zero 64-bit unsigned integer to use as the key in the AtomicArray\n"
+        "key : A non-zero unsigned integer to use as the key in the AtomicArray\n"
         "\n"
         "Return value\n"
         "----------\n"

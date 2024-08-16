@@ -20,7 +20,12 @@ typedef struct {
 typedef struct {
     PyObject_HEAD
     atomic_uint_fast64_t *val;
-} AtomicValue;
+} AtomicValue64;
+
+typedef struct {
+    PyObject_HEAD
+    atomic_uint_fast32_t *val;
+} AtomicValue32;
 
 typedef struct {
     PyObject_HEAD

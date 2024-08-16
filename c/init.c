@@ -34,27 +34,50 @@ PyTypeObject AtomicArrayType = {
     .tp_methods = atomic_array_methods,
 };
 
-PyMethodDef atomic_value_methods[] = {
-    {"load",  (PyCFunction) atomic_value_load,  METH_FASTCALL, atomic_value_load_doc},
-    {"store", (PyCFunction) atomic_value_store, METH_FASTCALL, atomic_value_store_doc},
-    {"swap",  (PyCFunction) atomic_value_swap,  METH_FASTCALL, atomic_value_swap_doc},
-    {"add",   (PyCFunction) atomic_value_add,   METH_FASTCALL, atomic_value_add_doc},
-    {"sub",   (PyCFunction) atomic_value_sub,   METH_FASTCALL, atomic_value_sub_doc},
-    {"and",   (PyCFunction) atomic_value_and,   METH_FASTCALL, atomic_value_and_doc},
-    {"or",    (PyCFunction) atomic_value_or,    METH_FASTCALL, atomic_value_or_doc},
-    {"xor",   (PyCFunction) atomic_value_xor,   METH_FASTCALL, atomic_value_xor_doc},
-    {"cas",   (PyCFunction) atomic_value_cas,   METH_FASTCALL, atomic_value_cas_doc},
+PyMethodDef atomic_value_64_methods[] = {
+    {"load",  (PyCFunction) atomic_value_64_load,  METH_FASTCALL, atomic_value_load_doc},
+    {"store", (PyCFunction) atomic_value_64_store, METH_FASTCALL, atomic_value_store_doc},
+    {"swap",  (PyCFunction) atomic_value_64_swap,  METH_FASTCALL, atomic_value_swap_doc},
+    {"add",   (PyCFunction) atomic_value_64_add,   METH_FASTCALL, atomic_value_add_doc},
+    {"sub",   (PyCFunction) atomic_value_64_sub,   METH_FASTCALL, atomic_value_sub_doc},
+    {"and",   (PyCFunction) atomic_value_64_and,   METH_FASTCALL, atomic_value_and_doc},
+    {"or",    (PyCFunction) atomic_value_64_or,    METH_FASTCALL, atomic_value_or_doc},
+    {"xor",   (PyCFunction) atomic_value_64_xor,   METH_FASTCALL, atomic_value_xor_doc},
+    {"cas",   (PyCFunction) atomic_value_64_cas,   METH_FASTCALL, atomic_value_cas_doc},
     {NULL}  /* Sentinel */
 };
 
-PyTypeObject AtomicValueType = {
+PyTypeObject AtomicValue64Type = {
     .ob_base = PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "atomic_dict_c.AtomicValue",
-    .tp_basicsize = sizeof(AtomicValue),
+    .tp_name = "atomic_dict_c.AtomicValue64",
+    .tp_basicsize = sizeof(AtomicValue64),
     .tp_itemsize = 0,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
     .tp_new = PyType_GenericNew,
-    .tp_methods = atomic_value_methods,
+    .tp_methods = atomic_value_64_methods,
+};
+
+PyMethodDef atomic_value_32_methods[] = {
+    {"load",  (PyCFunction) atomic_value_32_load,  METH_FASTCALL, atomic_value_load_doc},
+    {"store", (PyCFunction) atomic_value_32_store, METH_FASTCALL, atomic_value_store_doc},
+    {"swap",  (PyCFunction) atomic_value_32_swap,  METH_FASTCALL, atomic_value_swap_doc},
+    {"add",   (PyCFunction) atomic_value_32_add,   METH_FASTCALL, atomic_value_add_doc},
+    {"sub",   (PyCFunction) atomic_value_32_sub,   METH_FASTCALL, atomic_value_sub_doc},
+    {"and",   (PyCFunction) atomic_value_32_and,   METH_FASTCALL, atomic_value_and_doc},
+    {"or",    (PyCFunction) atomic_value_32_or,    METH_FASTCALL, atomic_value_or_doc},
+    {"xor",   (PyCFunction) atomic_value_32_xor,   METH_FASTCALL, atomic_value_xor_doc},
+    {"cas",   (PyCFunction) atomic_value_32_cas,   METH_FASTCALL, atomic_value_cas_doc},
+    {NULL}  /* Sentinel */
+};
+
+PyTypeObject AtomicValue32Type = {
+    .ob_base = PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "atomic_dict_c.AtomicValue32",
+    .tp_basicsize = sizeof(AtomicValue32),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_new = PyType_GenericNew,
+    .tp_methods = atomic_value_32_methods,
 };
 
 PyMethodDef dict_iterator_methods[] = {
@@ -76,8 +99,8 @@ PyTypeObject DictIteratorType = {
 
 PyMODINIT_FUNC PyInit_atomic_dict_c(void) {
     PyObject *m;
-    if (PyType_Ready(&AtomicArrayType) < 0 || PyType_Ready(&AtomicValueType) < 0 ||
-        PyType_Ready(&DictIteratorType) < 0) {
+    if (PyType_Ready(&AtomicArrayType) < 0 || PyType_Ready(&AtomicValue64Type) < 0 ||
+        PyType_Ready(&AtomicValue32Type) < 0 || PyType_Ready(&DictIteratorType) < 0) {
         return NULL;
     }
 
@@ -91,7 +114,12 @@ PyMODINIT_FUNC PyInit_atomic_dict_c(void) {
         return NULL;
     }
 
-    if (PyModule_AddObjectRef(m, "AtomicValue", (PyObject *) &AtomicValueType) < 0) {
+    if (PyModule_AddObjectRef(m, "AtomicValue64", (PyObject *) &AtomicValue64Type) < 0) {
+        Py_DECREF(m);
+        return NULL;
+    }
+
+    if (PyModule_AddObjectRef(m, "AtomicValue32", (PyObject *) &AtomicValue32Type) < 0) {
         Py_DECREF(m);
         return NULL;
     }

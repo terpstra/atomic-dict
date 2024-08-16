@@ -1,6 +1,6 @@
 #include "methods.h"
 
-extern PyTypeObject AtomicValueType;
+extern PyTypeObject AtomicValue64Type;
 extern PyTypeObject DictIteratorType;
 
 int atomic_array_init(AtomicArray *self, PyObject *args, PyObject *kwds) {
@@ -39,20 +39,20 @@ static uint64_t key_hash(uint64_t key) {
     return 0;                                                                             \
 }
 
-AtomicValue *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ssize_t nargs) {
+AtomicValue64 *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ssize_t nargs) {
     atomic_uint_fast64_t key;
     atomic_uint_fast64_t expected;
     uint64_t             hash;
     Py_ssize_t           index;
     Py_ssize_t           stride;
     Py_ssize_t           attempts;
-    AtomicValue         *value;
+    AtomicValue64       *value;
 
     CHECK_ARGN("AtomicArray.index", 1);
 
     key = PyLong_AsUnsignedLongLong(args[0]);
     
-    value = PyObject_New(AtomicValue, &AtomicValueType);
+    value = PyObject_New(AtomicValue64, &AtomicValue64Type);
     if (!value) return value;
 
     hash = key_hash(key);
@@ -104,54 +104,106 @@ DictIterator *atomic_array_iterator(AtomicArray *self, PyObject * const *args, P
     return out;
 }
 
-PyObject *atomic_value_load(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.load", 0);
+
+PyObject *atomic_value_64_load(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.load", 0);
     return PyLong_FromUnsignedLongLong(atomic_load(self->val));
 }
 
-PyObject *atomic_value_store(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.store", 1);
+PyObject *atomic_value_64_store(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.store", 1);
     atomic_store(self->val, PyLong_AsUnsignedLongLong(args[0]));
     Py_RETURN_NONE;
 }
 
-PyObject *atomic_value_swap(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.swap", 1);
+PyObject *atomic_value_64_swap(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.swap", 1);
     return PyLong_FromUnsignedLongLong(atomic_exchange(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
-PyObject *atomic_value_add(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.add", 1);
+PyObject *atomic_value_64_add(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.add", 1);
     return PyLong_FromUnsignedLongLong(atomic_fetch_add(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
-PyObject *atomic_value_sub(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.sub", 1);
+PyObject *atomic_value_64_sub(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.sub", 1);
     return PyLong_FromUnsignedLongLong(atomic_fetch_sub(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
-PyObject *atomic_value_and(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.and", 1);
+PyObject *atomic_value_64_and(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.and", 1);
     return PyLong_FromUnsignedLongLong(atomic_fetch_and(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
-PyObject *atomic_value_or(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.or", 1);
+PyObject *atomic_value_64_or(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.or", 1);
     return PyLong_FromUnsignedLongLong(atomic_fetch_or(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
-PyObject *atomic_value_xor(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.xor", 1);
+PyObject *atomic_value_64_xor(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.xor", 1);
     return PyLong_FromUnsignedLongLong(atomic_fetch_xor(self->val, PyLong_AsUnsignedLongLong(args[0])));
 }
 
-PyObject *atomic_value_cas(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
-    CHECK_ARGN("AtomicValue.cas", 2);
+PyObject *atomic_value_64_cas(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue64.cas", 2);
     atomic_uint_fast64_t expected = PyLong_AsUnsignedLongLong(args[0]);
     atomic_uint_fast64_t desired  = PyLong_AsUnsignedLongLong(args[1]);
     atomic_compare_exchange_strong(self->val, &expected, desired);
     return PyLong_FromUnsignedLongLong(expected);
 }
+
+
+PyObject *atomic_value_32_load(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.load", 0);
+    return PyLong_FromUnsignedLong(atomic_load(self->val));
+}
+
+PyObject *atomic_value_32_store(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.store", 1);
+    atomic_store(self->val, PyLong_AsUnsignedLong(args[0]));
+    Py_RETURN_NONE;
+}
+
+PyObject *atomic_value_32_swap(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.swap", 1);
+    return PyLong_FromUnsignedLong(atomic_exchange(self->val, PyLong_AsUnsignedLong(args[0])));
+}
+
+PyObject *atomic_value_32_add(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.add", 1);
+    return PyLong_FromUnsignedLong(atomic_fetch_add(self->val, PyLong_AsUnsignedLong(args[0])));
+}
+
+PyObject *atomic_value_32_sub(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.sub", 1);
+    return PyLong_FromUnsignedLong(atomic_fetch_sub(self->val, PyLong_AsUnsignedLong(args[0])));
+}
+
+PyObject *atomic_value_32_and(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.and", 1);
+    return PyLong_FromUnsignedLong(atomic_fetch_and(self->val, PyLong_AsUnsignedLong(args[0])));
+}
+
+PyObject *atomic_value_32_or(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.or", 1);
+    return PyLong_FromUnsignedLong(atomic_fetch_or(self->val, PyLong_AsUnsignedLong(args[0])));
+}
+
+PyObject *atomic_value_32_xor(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.xor", 1);
+    return PyLong_FromUnsignedLong(atomic_fetch_xor(self->val, PyLong_AsUnsignedLong(args[0])));
+}
+
+PyObject *atomic_value_32_cas(AtomicValue32 *self, PyObject * const *args, Py_ssize_t nargs) {
+    CHECK_ARGN("AtomicValue32.cas", 2);
+    atomic_uint_fast32_t expected = PyLong_AsUnsignedLong(args[0]);
+    atomic_uint_fast32_t desired  = PyLong_AsUnsignedLong(args[1]);
+    atomic_compare_exchange_strong(self->val, &expected, desired);
+    return PyLong_FromUnsignedLong(expected);
+}
+
 
 PyObject *dict_iterator_key(DictIterator *self, PyObject * const *args, Py_ssize_t nargs) {
     AtomicCacheBlock *block = self->array->blocks + (self->offset >> 2);
@@ -198,7 +250,7 @@ PyObject *dict_iterator_next(DictIterator *self, PyObject * const *args, Py_ssiz
     Py_RETURN_NONE;
 }
 
-PyObject *get_pointer(AtomicValue *self, PyObject * const *args, Py_ssize_t nargs) {
+PyObject *get_pointer(AtomicValue64 *self, PyObject * const *args, Py_ssize_t nargs) {
     CHECK_ARGN("get_pointer", 1);
 
     const char *name = PyCapsule_GetName(args[0]);
