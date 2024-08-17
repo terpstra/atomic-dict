@@ -24,17 +24,12 @@ class DictEntryIterator:
         self.it.next()
         return (key, val)
 
-class AtomicDict:
+class AtomicBase:
     mm: mmap
     mv: memoryview
     aa: AtomicArray
 
-    def __init__(self, max_entries: int, k64: int = 1, k32: int = 0, v64: int = 1, v32: int = 0) -> None:
-        """Create a multi-process / multi-threaded shared dictionary.
-
-        Once created, fork()'d child processes will share this map with the parent.
-        """
-
+    def __init__(self, max_entries: int, k64: int, k32: int, v64: int, v32: int) -> None:
         # calculate how many rows per cache-block
         nbytes = (k64 + v64) * 8 + (k32 + v32) * 4
         rows = 64 // nbytes
@@ -72,6 +67,21 @@ class AtomicDict:
         self.mv.release()
         self.mm.close()
 
+    def __iter__(self) -> DictEntryIterator:
+        """NON-ATOMICALLY iterate through the AtomicDict contents."""
+
+        return DictEntryIterator(self.aa.iterator())
+
+class AtomicDict(AtomicBase):
+    def __init__(self, max_entries: int, k64: int = 1, k32: int = 0, v64: int = 1, v32: int = 0) -> None:
+        """Create a multi-process / multi-threaded shared dictionary.
+
+        Once created, fork()'d child processes will share this map with the parent.
+        """
+
+        assert v64 + v32 == 1, "AtomicDict must have exactly one value"
+        super().__init__(max_entries, k64, k32, v64, v32)
+
     def __getitem__(self, key: int | tuple[int, ...]) -> AtomicValue32 | AtomicValue64:
         """dict[key] will return the AtomicValue associated with key
 
@@ -80,9 +90,12 @@ class AtomicDict:
         """
 
         if isinstance(key, int):
-            return self.aa.index(key)
+            av = self.aa.index(key)
         else:
-            return self.aa.index(*key)
+            av = self.aa.index(*key)
+
+        assert not isinstance(av, bool)
+        return av
 
     def __setitem__(self, key: int | tuple[int, ...], value: int) -> None:
         """`dict[key] = value` will update the AtomicValue associated with key to value.
@@ -92,11 +105,29 @@ class AtomicDict:
         """
 
         if isinstance(key, int):
-            self.aa.index(key).store(value)
+            av = self.aa.index(key)
         else:
-            self.aa.index(*key).store(value)
+            av = self.aa.index(*key)
 
-    def __iter__(self) -> DictEntryIterator:
-        """NON-ATOMICALLY iterate through the AtomicDict contents."""
+        assert not isinstance(av, bool)
+        av.store(value)
 
-        return DictEntryIterator(self.aa.iterator())
+class AtomicSet(AtomicBase):
+
+    def __init__(self, max_entries: int, k64: int = 1, k32: int = 0) -> None:
+        """Create a multi-process / multi-threaded shared dictionary.
+
+        Once created, fork()'d child processes will share this map with the parent.
+        """
+
+        super().__init__(max_entries, k64, k32, 0, 0)
+
+    def add(self, key: int | tuple[int, ...]) -> bool:
+        if isinstance(key, int):
+            out = self.aa.index(key)
+        else:
+            out = self.aa.index(*key)
+
+        assert isinstance(out, bool)
+        return out
+
