@@ -13,7 +13,7 @@ atomic_dict_capi_module = Extension(
 
 setup(
     name="atomic_dict",
-    version="0.4.0",
+    version="0.5.0",
     packages=find_packages(),
     ext_modules=[atomic_dict_capi_module],
 )
