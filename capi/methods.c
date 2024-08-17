@@ -103,12 +103,20 @@ PyObject *atomic_array_index(AtomicArray *self, PyObject * const *args, Py_ssize
 
     for (ki = 0; ki < self->k64; ++ki) {
       kv = PyLong_AsUnsignedLongLong(args[ki]);
+      if (!kv) {
+        PyErr_SetString(PyExc_ValueError, "AtomicArray.index requires key arguments to be non-zero");
+        return 0;
+      }
       key.a64[ki] = kv;
       hash = key_hash(hash ^ kv);
     }
 
     for (ki = 0; ki < self->k32; ++ki) {
       kv = PyLong_AsUnsignedLong(args[ki + self->k64]);
+      if (!kv) {
+        PyErr_SetString(PyExc_ValueError, "AtomicArray.index requires key arguments to be non-zero");
+        return 0;
+      }
       key.a32[ki + 2 * self->k64] = kv;
       hash = key_hash(hash ^ kv);
     }
