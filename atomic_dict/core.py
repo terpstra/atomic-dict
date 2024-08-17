@@ -34,8 +34,6 @@ class AtomicDict:
 
         Once created, fork()'d child processes will share this map with the parent.
         """
-        # we want 3/8 <= load factor <= 3/4
-        max_entries = (max_entries * 3) // 2
 
         # calculate how many rows per cache-block
         nbytes = (k64 + v64) * 8 + (k32 + v32) * 4
@@ -46,6 +44,10 @@ class AtomicDict:
         # round blocks up to a power-of-two
         blocks = (max_entries + rows - 1) // rows
         blocks = 1 << (blocks - 1).bit_length()
+
+        # keep the load factor below 3/4
+        if 4 * max_entries > 3 * blocks * rows:
+            blocks *= 2
 
         # blocks must be at least 64 (for a 4kiB mmap)
         if blocks < 64:
