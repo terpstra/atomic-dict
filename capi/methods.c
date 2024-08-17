@@ -297,7 +297,7 @@ PyObject *dict_iterator_key(DictIterator *self, PyObject * const *args, Py_ssize
     AtomicCacheBlock *block = self->array->blocks + (self->offset / self->array->rows);
     AtomicCacheBlock *end = self->array->blocks + self->array->num_blocks;
     int n64 = self->array->k64 + self->array->v64;
-    int n32 = self->array->k32 + self->array->k32;
+    int n32 = self->array->k32 + self->array->v32;
     int o32 = self->array->rows * n64 * 2;
     int ki;
 
@@ -338,7 +338,7 @@ PyObject *dict_iterator_value(DictIterator *self, PyObject * const *args, Py_ssi
     AtomicCacheBlock *block = self->array->blocks + (self->offset / self->array->rows);
     AtomicCacheBlock *end = self->array->blocks + self->array->num_blocks;
     int n64 = self->array->k64 + self->array->v64;
-    int n32 = self->array->k32 + self->array->k32;
+    int n32 = self->array->k32 + self->array->v32;
     int o32 = self->array->rows * n64 * 2;
 
     CHECK_ARGN("DictIterator.value", 0);
