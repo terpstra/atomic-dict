@@ -6,25 +6,29 @@
 #include <Python.h>
 #include <stdatomic.h>
 
-typedef struct {
-  atomic_uint_fast64_t keys[4];
-  atomic_uint_fast64_t vals[4];
+typedef atomic_uint_least64_t atomic_dict64_t;
+typedef atomic_uint_least32_t atomic_dict32_t;
+
+typedef union {
+  atomic_dict64_t a64[8];
+  atomic_dict32_t a32[16];
 } AtomicCacheBlock;
 
 typedef struct {
     PyObject_HEAD
     AtomicCacheBlock *blocks;
+    int k64, k32, v64, v32, rows;
     Py_ssize_t num_blocks;
 } AtomicArray;
 
 typedef struct {
     PyObject_HEAD
-    atomic_uint_fast64_t *val;
+    atomic_dict64_t *val;
 } AtomicValue64;
 
 typedef struct {
     PyObject_HEAD
-    atomic_uint_fast32_t *val;
+    atomic_dict32_t *val;
 } AtomicValue32;
 
 typedef struct {

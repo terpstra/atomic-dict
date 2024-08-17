@@ -115,8 +115,8 @@ PyDoc_STRVAR(
         "The value immediately preceding the effects of this function");
 
 PyDoc_STRVAR(
-        atomic_value_and_doc,
-        "and(self, arg)\n"
+        atomic_value_band_doc,
+        "band(self, arg)\n"
         "--\n"
         "\n"
         "Bitwise AND arg with the AtomicValue\n"
@@ -131,8 +131,8 @@ PyDoc_STRVAR(
 
 
 PyDoc_STRVAR(
-        atomic_value_or_doc,
-        "or(self, arg)\n"
+        atomic_value_bor_doc,
+        "bor(self, arg)\n"
         "--\n"
         "\n"
         "Bitwise OR arg with the AtomicValue\n"
@@ -146,8 +146,8 @@ PyDoc_STRVAR(
         "The value immediately preceding the effects of this function");
 
 PyDoc_STRVAR(
-        atomic_value_xor_doc,
-        "xor(self, arg)\n"
+        atomic_value_bxor_doc,
+        "bxor(self, arg)\n"
         "--\n"
         "\n"
         "Bitwise XOR arg with the AtomicValue\n"
