@@ -7,7 +7,7 @@ sys.argv.extend(cmd)
 
 atomic_dict_capi_module = Extension(
     "atomic_dict.capi",
-    sources=["c/init.c", "c/methods.c"],
+    sources=["capi/init.c", "capi/methods.c"],
     extra_compile_args=["-O3"]
 )
 
